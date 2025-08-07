@@ -2,7 +2,8 @@ import React, { useState, useCallback, useRef, useEffect } from 'react';
 import axios from 'axios';
 import { useDropzone } from 'react-dropzone';
 import { Link } from 'react-router-dom';
-import { UploadCloud, Leaf, AlertTriangle, Loader2, Sparkles, Wand2, ArrowRight, CheckCircle2, Microscope, Map, Camera, X, RefreshCw, Lock } from 'lucide-react';
+// CORRECTED: Removed the unused 'Map' and 'Wand2' icons from this list
+import { UploadCloud, Leaf, AlertTriangle, Loader2, Sparkles, ArrowRight, CheckCircle2, Microscope, Camera, X, RefreshCw, Lock } from 'lucide-react';
 
 // Main component for the disease detection feature
 const DetectDiseasePage = () => {
@@ -108,7 +109,6 @@ const DetectDiseasePage = () => {
         try {
             const token = localStorage.getItem('token');
             const config = { headers: { 'Authorization': `Bearer ${token}` } };
-            // UPDATED: URL is now relative for deployment
             const { data } = await axios.post('/api/predict', formData, config);
             setPrediction(data);
         } catch (err) {
