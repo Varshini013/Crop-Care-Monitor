@@ -1,43 +1,53 @@
 import sys
 import json
 import numpy as np
-import tensorflow as tf # We still need tensorflow, but only for the 'lite' interpreter
+import tensorflow as tf
+import os
+from tensorflow.keras.preprocessing import image
 
 def predict_disease(image_path):
     """
     Loads a lightweight .tflite model and predicts disease.
     """
     try:
-        # 1. Load the TFLite model and allocate tensors. This is much faster.
-        interpreter = tf.lite.Interpreter(model_path='model/model.tflite')
+        # --- THIS IS THE FIX ---
+        # Vercel places our files in specific directories. This finds the correct path
+        # to the model files within the live deployment environment.
+        script_dir = os.path.dirname(__file__)
+        model_path = os.path.join(script_dir, 'model.tflite')
+        class_names_path = os.path.join(script_dir, 'class_names.json')
+        # --- END OF FIX ---
+
+        # Load the TFLite model and allocate tensors.
+        interpreter = tf.lite.Interpreter(model_path=model_path)
         interpreter.allocate_tensors()
 
-        # 2. Get input and output details.
+        # Get input and output details.
         input_details = interpreter.get_input_details()
         output_details = interpreter.get_output_details()
 
-        # 3. Load the class names.
-        with open('model/class_names.json', 'r') as f:
+        # Load the class names.
+        with open(class_names_path, 'r') as f:
             class_names = json.load(f)
 
-        # 4. Load and preprocess the image.
-        img = tf.keras.preprocessing.image.load_img(image_path, target_size=(128, 128))
-        img_array = tf.keras.preprocessing.image.img_to_array(img)
+        # Load and preprocess the image.
+        img = image.load_img(image_path, target_size=(128, 128))
+        img_array = image.img_to_array(img)
         img_batch = np.expand_dims(img_array, axis=0).astype(np.float32)
 
-        # 5. Set the image as input to the model.
+        # Set the image as input to the model.
         interpreter.set_tensor(input_details[0]['index'], img_batch)
 
-        # 6. Run the prediction.
+        # Run the prediction.
         interpreter.invoke()
 
-        # 7. Get the result.
+        # Get the result.
         predictions = interpreter.get_tensor(output_details[0]['index'])
         
         predicted_class_index = np.argmax(predictions[0])
         predicted_class_name = class_names[predicted_class_index]
         
-        # 8. Print the final result.
+        # Print the final result.
         print(predicted_class_name)
 
     except Exception as e:
@@ -46,6 +56,7 @@ def predict_disease(image_path):
 
 if __name__ == '__main__':
     if len(sys.argv) > 1:
+        # The image path from Node.js is an absolute path to a temporary file, so it works correctly.
         image_file_path = sys.argv[1]
         predict_disease(image_file_path)
     else:
