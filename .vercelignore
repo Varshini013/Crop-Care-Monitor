@@ -1,0 +1,8 @@
+# Ignore the large, original Keras model. It's not needed for production.
+api/model/trained_plant_disease_model.keras
+
+# Also ignore the training history file.
+api/model/training_hist.json
+
+# Ignore the one-time converter script.
+api/model/converter.py
