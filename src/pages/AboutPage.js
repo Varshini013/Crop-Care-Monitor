@@ -1,5 +1,5 @@
 import React from 'react';
-import { Leaf, Cpu, Users, Target } from 'lucide-react';
+import { Leaf, Cpu, Target } from 'lucide-react';
 
 // Team Member Card Component
 const TeamMemberCard = ({ name, role, imageUrl }) => (
