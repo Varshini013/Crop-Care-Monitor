@@ -1,3 +1,4 @@
-tensorflow
+# We replace the full tensorflow with the lightweight tflite-runtime
+tflite-runtime
 numpy
 Pillow
