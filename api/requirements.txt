@@ -1,4 +1,4 @@
-# We replace the full tensorflow with the lightweight and compatible tensorflow-lite
-tensorflow-lite
+# We replace the incompatible tensorflow-lite with the official tensorflow library
+tensorflow
 numpy
 Pillow
