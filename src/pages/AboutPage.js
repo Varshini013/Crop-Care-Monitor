@@ -7,7 +7,8 @@ const TeamMemberCard = ({ name, role, imageUrl }) => (
         <img 
             className="mx-auto h-32 w-32 rounded-full object-cover shadow-lg" 
             src={imageUrl} 
-            alt={`Photo of ${name}`} 
+            // THIS IS THE FIX: The alt text no longer contains the redundant word "Photo"
+            alt={name} 
         />
         <h3 className="mt-4 text-xl font-semibold text-gray-800">{name}</h3>
         <p className="text-green-600">{role}</p>
@@ -58,8 +59,8 @@ const AboutPage = () => {
                     </div>
                      <div className="bg-white p-6 rounded-lg shadow-md">
                         <Leaf className="mx-auto h-12 w-12 text-green-600 mb-4" />
-                        <h3 className="text-xl font-semibold mb-2">Real-Time Data</h3>
-                        <p className="text-gray-600">We use web scraping to provide you with current and relevant treatment suggestions, helping you make informed decisions quickly.</p>
+                        <h3 className="text-xl font-semibold mb-2">AI-Powered Remedies</h3>
+                        <p className="text-gray-600">We use the Gemini AI to provide you with current and relevant treatment suggestions, helping you make informed decisions quickly.</p>
                     </div>
                 </div>
             </div>
