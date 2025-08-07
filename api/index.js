@@ -2,23 +2,41 @@ require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const path = require('path'); // Import the path module
+const os = require('os');   // Import the os module
 
 const app = express();
 
-// Enhanced CORS Configuration to explicitly allow your frontend
+// --- THIS IS THE FIX ---
+// This configuration will use your Vercel URL when deployed,
+// and fall back to your localhost for local development.
+const allowedOrigins = [
+    process.env.FRONTEND_URL, // This will be your Vercel URL
+    'http://localhost:3000'
+];
+
 const corsOptions = {
-  origin: 'http://localhost:3000', // Allow only the frontend to access
-  methods: ['GET', 'POST', 'PUT', 'DELETE'], // Allowed HTTP methods
-  allowedHeaders: ['Content-Type', 'Authorization'], // Allowed headers
+  origin: function (origin, callback) {
+    // allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.indexOf(origin) === -1) {
+      const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
+      return callback(new Error(msg), false);
+    }
+    return callback(null, true);
+  },
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
 };
 app.use(cors(corsOptions));
 
-// Middleware to parse JSON bodies
+// Middleware
 app.use(express.json());
-// Middleware to serve uploaded images statically from the 'uploads' directory
-app.use('/uploads', express.static('uploads'));
 
-// Database Connection
+// Serve uploaded images statically from the temporary directory
+app.use('/uploads', express.static(path.join(os.tmpdir(), 'uploads')));
+
+// DB Connection
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('MongoDB connected successfully.'))
   .catch(err => console.error('MongoDB connection error:', err));
@@ -29,3 +47,6 @@ app.use('/api/predict', require('./routes/predictionRoutes'));
 
 const PORT = process.env.PORT || 5001;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
+// Export the app for Vercel
+module.exports = app;
