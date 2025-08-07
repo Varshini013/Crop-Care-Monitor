@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom'; // <-- Import Link for routing
 import { LifeBuoy, Mail, BookOpen, ChevronDown } from 'lucide-react';
 
 // Accordion Item for FAQs
@@ -57,7 +58,8 @@ const HelpPage = () => {
                         <BookOpen size={24} className="text-green-600 mb-2" />
                         <h3 className="text-xl font-bold text-gray-800">User Guide</h3>
                         <p className="text-gray-600 mt-1">Browse our comprehensive guide for step-by-step instructions.</p>
-                        <a href="#" className="font-semibold text-green-600 hover:underline mt-2 inline-block">Read the Guide</a>
+                        {/* CORRECTED: Replaced invalid <a> tag with a valid <Link> */}
+                        <Link to="/help" className="font-semibold text-green-600 hover:underline mt-2 inline-block">Read the Guide</Link>
                     </div>
                 </div>
             </div>
