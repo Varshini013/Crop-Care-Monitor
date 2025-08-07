@@ -1,5 +1,6 @@
 const { spawn } = require('child_process');
 const mongoose = require('mongoose');
+const path = require('path');
 const Prediction = require('../models/Prediction');
 
 // --- START: AI-Powered Remedy Functions with a Single, Structured Call ---
@@ -86,10 +87,9 @@ const predictDisease = (req, res) => {
     if (!req.file) return res.status(400).json({ message: 'No image file uploaded.' });
     const imagePath = req.file.path;
     
-    // --- THIS IS THE DEFINITIVE FIX ---
-    // We are changing the command from 'python' to 'python3' to work on Vercel's Linux servers.
-    const pythonProcess = spawn('python3', ['api/model/predict.py', imagePath]);
-    // --- END OF FIX ---
+    // This uses the correct command and path for Vercel's environment
+    const scriptPath = path.join(process.cwd(), 'api', 'model', 'predict.py');
+    const pythonProcess = spawn('python3', [scriptPath, imagePath]);
 
     let predictionResult = '';
     pythonProcess.stdout.on('data', (data) => { predictionResult += data.toString(); });
@@ -104,7 +104,7 @@ const predictDisease = (req, res) => {
             return res.status(500).json({ message: 'Failed to get a valid prediction from the model.' });
         }
         
-        const newPrediction = new Prediction({ user: req.user.id, diseaseName, imageUrl: `/${imagePath.replace(/\\/g, '/').split('/').pop()}`, remedy: "Click 'View Treatment Plan' for details." });
+        const newPrediction = new Prediction({ user: req.user.id, diseaseName, imageUrl: `/uploads/${path.basename(imagePath)}`, remedy: "Click 'View Treatment Plan' for details." });
         await newPrediction.save();
         res.status(200).json(newPrediction);
     });
@@ -112,18 +112,15 @@ const predictDisease = (req, res) => {
 
 const getHistory = async (req, res) => {
     try {
-        // THIS IS THE FIX: Using req.user._id ensures we are querying with a proper ObjectId.
         const history = await Prediction.find({ user: req.user._id }).sort({ createdAt: -1 });
         res.json(history);
     } catch (error) {
-        console.error('!!! DATABASE ERROR in getHistory:', error);
         res.status(500).json({ message: 'Server error while fetching prediction history.' });
     }
 };
 
 const getStats = async (req, res) => {
     try {
-        // THIS IS THE FIX: Aggregation queries are stricter and require the ID to be an ObjectId.
         const stats = await Prediction.aggregate([
             { $match: { user: req.user._id } },
             { $group: { _id: '$diseaseName', count: { $sum: 1 } } },
@@ -132,7 +129,6 @@ const getStats = async (req, res) => {
         ]);
         res.json(stats);
     } catch (error) {
-        console.error('!!! DATABASE ERROR in getStats:', error);
         res.status(500).json({ message: 'Server error while fetching statistics.' });
     }
 };
@@ -143,13 +139,9 @@ const deletePredictions = async (req, res) => {
         return res.status(400).json({ message: 'Invalid request: "ids" must be an array.' });
     }
     try {
-        await Prediction.deleteMany({
-            _id: { $in: ids },
-            user: req.user._id // THIS IS THE FIX: Using ObjectId for security.
-        });
+        await Prediction.deleteMany({ _id: { $in: ids }, user: req.user._id });
         res.json({ message: 'Selected predictions deleted successfully.' });
     } catch (error) {
-        console.error('!!! DATABASE ERROR in deletePredictions:', error);
         res.status(500).json({ message: 'Server error while deleting predictions.' });
     }
 };
@@ -165,7 +157,7 @@ const getWeeklyActivity = async (req, res) => {
         const activity = await Prediction.aggregate([
             {
                 $match: {
-                    user: req.user._id, // THIS IS THE FIX: Using the ObjectId here as well.
+                    user: req.user._id,
                     createdAt: { $gte: sevenDaysAgo, $lte: today }
                 }
             },
@@ -201,7 +193,6 @@ const getWeeklyActivity = async (req, res) => {
         
         res.json(Array.from(dateMap.values()).reverse());
     } catch (error) {
-        console.error('!!! DATABASE ERROR in getWeeklyActivity:', error);
         res.status(500).json({ message: 'Server error while fetching activity.' });
     }
 };
