@@ -1,4 +1,4 @@
-# This is the correct, lightweight library for Vercel
-tflite-runtime
+# We replace the incompatible tflite-runtime with the official tensorflow library
+tensorflow
 numpy
 Pillow
