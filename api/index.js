@@ -2,38 +2,37 @@ require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-const path = require('path'); // Import the path module
-const os = require('os');   // Import the os module
+const path = require('path');
+const os = require('os');
 
 const app = express();
 
-// --- THIS IS THE FIX ---
-// This configuration will use your Vercel URL when deployed,
-// and fall back to your localhost for local development.
-const allowedOrigins = [
-    process.env.FRONTEND_URL, // This will be your Vercel URL
-    'http://localhost:3000'
-];
-
+// --- THIS IS THE DEFINITIVE FIX ---
+// This new configuration is smarter. It will allow requests from your local computer
+// AND from any live URL that Vercel creates for your project.
 const corsOptions = {
   origin: function (origin, callback) {
-    // allow requests with no origin (like mobile apps or curl requests)
-    if (!origin) return callback(null, true);
-    if (allowedOrigins.indexOf(origin) === -1) {
-      const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
-      return callback(new Error(msg), false);
+    // Allow localhost for local development
+    if (!origin || origin.startsWith('http://localhost')) {
+      return callback(null, true);
     }
-    return callback(null, true);
+    // Allow any vercel.app subdomain for deployed previews and production
+    if (origin.endsWith('.vercel.app')) {
+      return callback(null, true);
+    }
+    
+    const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
+    return callback(new Error(msg), false);
   },
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization'],
 };
 app.use(cors(corsOptions));
+// --- END OF FIX ---
+
 
 // Middleware
 app.use(express.json());
-
-// Serve uploaded images statically from the temporary directory
 app.use('/uploads', express.static(path.join(os.tmpdir(), 'uploads')));
 
 // DB Connection
