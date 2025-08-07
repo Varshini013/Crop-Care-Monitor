@@ -12,11 +12,12 @@ const app = express();
 // AND from any live URL that Vercel creates for your project.
 const corsOptions = {
   origin: function (origin, callback) {
-    // Allow localhost for local development
+    // Allow localhost for local development and requests with no origin (like Postman)
     if (!origin || origin.startsWith('http://localhost')) {
       return callback(null, true);
     }
     // Allow any vercel.app subdomain for deployed previews and production
+    // This is the key part that fixes the error.
     if (origin.endsWith('.vercel.app')) {
       return callback(null, true);
     }
