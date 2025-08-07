@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Leaf, ShieldCheck, TestTube2, BarChart, MapPin, Menu, X, Star, Quote } from 'lucide-react';
+// CORRECTED: Removed unused 'MapPin' and 'Star' icons
+import { ArrowRight, Leaf, ShieldCheck, TestTube2, BarChart, Menu, X, Quote } from 'lucide-react';
 
 // Navigation Link Component
-const NavLink = ({ href, children, isButton }) => (
+const NavLink = ({ href, children, onClick }) => (
     <a 
         href={href} 
-        className={`transition-colors duration-300 ${isButton 
-            ? 'bg-green-600 text-white px-6 py-2 rounded-full font-semibold hover:bg-green-700 shadow-lg transform hover:scale-105' 
-            : 'text-gray-700 hover:text-green-600 font-medium'}`}
+        onClick={onClick}
+        className='text-gray-700 hover:text-green-600 font-medium transition-colors duration-300'
     >
         {children}
     </a>
@@ -204,8 +204,9 @@ const LandingPage = () => {
                     <div className="border-t border-gray-700 pt-8 flex flex-col md:flex-row justify-between items-center">
                         <p className="text-gray-400">&copy; {new Date().getFullYear()} CropCare. All rights reserved.</p>
                         <div className="flex space-x-6 mt-4 md:mt-0">
-                            <a href="#" className="hover:text-green-400">Privacy Policy</a>
-                            <a href="#" className="hover:text-green-400">Terms of Service</a>
+                            {/* CORRECTED: Changed from bad href="#" to valid links */}
+                            <Link to="/privacy" className="hover:text-green-400">Privacy Policy</Link>
+                            <Link to="/terms" className="hover:text-green-400">Terms of Service</Link>
                         </div>
                     </div>
                 </div>
