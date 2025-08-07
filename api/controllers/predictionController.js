@@ -85,7 +85,12 @@ const getRemedyDetails = async (req, res) => {
 const predictDisease = (req, res) => {
     if (!req.file) return res.status(400).json({ message: 'No image file uploaded.' });
     const imagePath = req.file.path;
-    const pythonProcess = spawn('python', ['model/predict.py', imagePath]);
+    
+    // --- THIS IS THE DEFINITIVE FIX ---
+    // We are changing the command from 'python' to 'python3' to work on Vercel's Linux servers.
+    const pythonProcess = spawn('python3', ['model/predict.py', imagePath]);
+    // --- END OF FIX ---
+
     let predictionResult = '';
     pythonProcess.stdout.on('data', (data) => { predictionResult += data.toString(); });
     pythonProcess.stderr.on('data', (data) => { console.error(`Python Script Error: ${data}`); });
