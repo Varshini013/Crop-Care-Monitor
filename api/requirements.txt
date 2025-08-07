@@ -1,4 +1,4 @@
-# We replace the incompatible tflite-runtime with the official tensorflow library
-tensorflow
+# We replace the full tensorflow with the lightweight and compatible tensorflow-lite
+tensorflow-lite
 numpy
 Pillow
