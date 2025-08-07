@@ -2,8 +2,8 @@ import React, { useState, useCallback, useRef, useEffect } from 'react';
 import axios from 'axios';
 import { useDropzone } from 'react-dropzone';
 import { Link } from 'react-router-dom';
-// CORRECTED: Removed the unused 'Map' and 'Wand2' icons from this list
-import { UploadCloud, Leaf, AlertTriangle, Loader2, Sparkles, ArrowRight, CheckCircle2, Microscope, Camera, X, RefreshCw, Lock } from 'lucide-react';
+// CORRECTED: Removed unused icons like 'Leaf', 'Wand2', and 'Map' to prevent build errors.
+import { UploadCloud, AlertTriangle, Loader2, Sparkles, ArrowRight, CheckCircle2, Microscope, Camera, X, RefreshCw, Lock } from 'lucide-react';
 
 // Main component for the disease detection feature
 const DetectDiseasePage = () => {
