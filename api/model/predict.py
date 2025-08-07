@@ -2,22 +2,21 @@ import sys
 import json
 import numpy as np
 import os
-from PIL import Image
-
-# THIS IS THE FIX: We import from the new, lightweight tflite_runtime
-import tflite_runtime.interpreter as tflite
+import tensorflow as tf
+from tensorflow.keras.preprocessing import image
 
 def predict_disease(image_path):
     """
-    Loads a lightweight .tflite model and predicts disease using tflite-runtime.
+    Loads a lightweight .tflite model and predicts disease using the full TensorFlow library.
     """
     try:
+        # Vercel places our files in specific directories. This finds the correct path.
         script_dir = os.path.dirname(__file__)
         model_path = os.path.join(script_dir, 'model.tflite')
         class_names_path = os.path.join(script_dir, 'class_names.json')
 
-        # Load the TFLite model using the new library
-        interpreter = tflite.Interpreter(model_path=model_path)
+        # Load the TFLite model using the standard TensorFlow interpreter
+        interpreter = tf.lite.Interpreter(model_path=model_path)
         interpreter.allocate_tensors()
 
         input_details = interpreter.get_input_details()
@@ -26,10 +25,10 @@ def predict_disease(image_path):
         with open(class_names_path, 'r') as f:
             class_names = json.load(f)
 
-        # Preprocess the image using Pillow and NumPy
-        img = Image.open(image_path).resize((128, 128))
-        img_array = np.array(img, dtype=np.float32)
-        img_batch = np.expand_dims(img_array, axis=0)
+        # Preprocess the image using the reliable tf.keras functions
+        img = image.load_img(image_path, target_size=(128, 128))
+        img_array = image.img_to_array(img)
+        img_batch = np.expand_dims(img_array, axis=0).astype(np.float32)
 
         interpreter.set_tensor(input_details[0]['index'], img_batch)
         interpreter.invoke()
