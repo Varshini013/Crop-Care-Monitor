@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import { Loader2, AlertTriangle, MapPin, Compass, Navigation } from 'lucide-react';
 import L from 'leaflet';
-import axios from 'axios';
 
 // This direct import is the most reliable way to ensure the map's CSS is loaded.
 import 'leaflet/dist/leaflet.css';
