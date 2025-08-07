@@ -2,17 +2,19 @@
   "version": 2,
   "builds": [
     {
-      "src": "api/**/*.py",
-      "use": "@vercel/python"
-    },
-    {
       "src": "api/index.js",
       "use": "@vercel/node"
     },
     {
+      "src": "api/requirements.txt",
+      "use": "@vercel/python"
+    },
+    {
       "src": "package.json",
       "use": "@vercel/static-build",
-      "config": { "distDir": "build" }
+      "config": {
+        "distDir": "build"
+      }
     }
   ],
   "rewrites": [
